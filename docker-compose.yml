@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13.4
+    ports:
+      - "5432:5432"
+    volumes:
+      - "db_data:/var/lib/postgresql/data"
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+  trader:
+    image: freo-cap/trader:latest
+    depends_on:
+      - db
+    ports:
+      - "${TRADER_PROMETHEUS_METRICS_PORT:-9568}:${TRADER_PROMETHEUS_METRICS_PORT:-9568}"
+    environment:
+      - DATABASE_URL=${DATABASE_URL:-ecto://postgres:postgres@db:5432/trader_?}
+      - NODE_COOKIE
+      - BEAM_PORT
+      - TRADER_PROMETHEUS_METRICS_PORT
+      - TRADER_HOST
+      - BITMEX_API_KEY
+      - BITMEX_API_SECRET
+      - BINANCE_API_KEY
+      - BINANCE_API_SECRET
+      - OKEX_API_KEY
+      - OKEX_API_PASSPHRASE
+      - OKEX_API_SECRET
+      - FTX_API_KEY
+      - FTX_API_SECRET
+
+volumes:
+  db_data:
